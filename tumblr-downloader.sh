@@ -6,12 +6,12 @@
 tumblr_app_key=fuiKNFp9vQFvjLNvx4sUwti4Yb5yGutBN4Xh10LXZhhRKjWlV4
 
 tumblr_blog_url=$1
-tumblr_blog_tags=$2
+#tumblr_blog_tags=$2
 tumblr_post_offset=0
 tumble_total_posts=
 
 if [ -z $1 ]; then
-	echo "Usage: $0 blog.tumblr.com [tags]"
+	echo "Usage: $0 blog.tumblr.com"
 	exit
 fi
 
@@ -37,7 +37,7 @@ fi
 while [ $tumblr_post_offset -lt $tumble_total_posts ]; do
 	echo "Processing page $tumblr_post_offset from $tumble_total_posts"
 	curl --silent --referer "https://www.tumblr.com/dashboard" --user-agent "Mozilla/5.0" --retry 3 --retry-delay 3 \
-	"https://api.tumblr.com/v2/blog/$tumblr_blog_url/posts/photo?api_key=$tumblr_app_key&offset=$tumblr_post_offset&limit=20&tag=$tumblr_blog_tags" |\
+	"https://api.tumblr.com/v2/blog/$tumblr_blog_url/posts/photo?api_key=$tumblr_app_key&offset=$tumblr_post_offset&limit=20" |\
 	jq '.response | .posts | .[] | .photos | .[] | .original_size | .url' >> $tumblr_blog_url.list
 	tumblr_post_offset=`expr $tumblr_post_offset + 20`
 	sleep 3
