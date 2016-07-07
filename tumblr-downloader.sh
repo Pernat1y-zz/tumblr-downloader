@@ -6,7 +6,6 @@
 tumblr_app_key=fuiKNFp9vQFvjLNvx4sUwti4Yb5yGutBN4Xh10LXZhhRKjWlV4
 
 tumblr_blog_url=$1
-#tumblr_blog_tags=$2
 tumblr_post_offset=0
 tumble_total_posts=
 
