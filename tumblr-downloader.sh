@@ -33,6 +33,8 @@ if [ $? -ne "0" ]; then
 	exit
 fi
 
+echo "" > $tumblr_blog_url.list
+
 while [ $tumblr_post_offset -lt $tumble_total_posts ]; do
 	echo "Processing page $tumblr_post_offset from $tumble_total_posts"
 	curl --silent --referer "https://www.tumblr.com/dashboard" --user-agent "Mozilla/5.0" --retry 3 --retry-delay 3 \
