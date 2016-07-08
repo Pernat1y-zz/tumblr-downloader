@@ -5,7 +5,7 @@
 
 tumblr_app_key=fuiKNFp9vQFvjLNvx4sUwti4Yb5yGutBN4Xh10LXZhhRKjWlV4
 
-tumblr_blog_url=$1
+tumblr_blog_url=`echo $1 | sed 's/https://g; s/http://g; s/\///g'`
 tumblr_post_offset=0
 tumble_total_posts=
 
@@ -24,7 +24,13 @@ tumble_total_posts=`curl --silent --referer "https://www.tumblr.com/dashboard" -
 "https://api.tumblr.com/v2/blog/$tumblr_blog_url/info?api_key=$tumblr_app_key" |\
 jq '.response | .blog | .total_posts' 2>/dev/null`
 
+if [ -z $tumble_total_posts ]; then
+	echo "Nothing found or too many requests."
+	exit
+fi
+
 echo "There are $tumble_total_posts posts. Getting list of URLs to download..."
+sleep 10
 
 mkdir -p "$tumblr_blog_url" 2>/dev/null
 cd "$tumblr_blog_url"
@@ -50,7 +56,7 @@ while [ $tumblr_post_offset -lt $tumble_total_posts ]; do
 		done
 		
 	tumblr_post_offset=`expr $tumblr_post_offset + 20`
-	sleep 5
+	sleep 10
 done
 
 echo "Done."
