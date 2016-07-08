@@ -22,7 +22,7 @@ fi
 
 tumble_total_posts=`curl --silent --referer "https://www.tumblr.com/dashboard" --user-agent "Mozilla/5.0" --retry 3 --retry-delay 3 \
 "https://api.tumblr.com/v2/blog/$tumblr_blog_url/info?api_key=$tumblr_app_key" |\
-jq '.response | .blog | .total_posts'`
+jq '.response | .blog | .total_posts' 2>/dev/null`
 
 echo "There are $tumble_total_posts posts. Getting list of URLs to download..."
 
@@ -33,23 +33,24 @@ if [ $? -ne "0" ]; then
 	exit
 fi
 
-echo "" > $tumblr_blog_url.list
-
 while [ $tumblr_post_offset -lt $tumble_total_posts ]; do
-	echo "Processing page $tumblr_post_offset from $tumble_total_posts"
+	echo "Downloading images. Page $tumblr_post_offset from $tumble_total_posts"
 	curl --silent --referer "https://www.tumblr.com/dashboard" --user-agent "Mozilla/5.0" --retry 3 --retry-delay 3 \
 	"https://api.tumblr.com/v2/blog/$tumblr_blog_url/posts/photo?api_key=$tumblr_app_key&offset=$tumblr_post_offset&limit=20" |\
-	jq '.response | .posts | .[] | .photos | .[] | .original_size | .url' >> $tumblr_blog_url.list
+	jq '.response | .posts | .[] | .photos | .[] | .original_size | .url' 2>/dev/null > $tumblr_blog_url.list
+	
+	if [ $? -eq "5" ]; then
+		echo "Error parsing output. Too many requests or API was changed."
+		exit
+	fi
+	
+		for tumblr_download_url in `cat $tumblr_blog_url.list | sed 's/\"//g'`; do
+			curl --silent --referer "https://www.tumblr.com/dashboard" --user-agent "Mozilla/5.0" \
+				--continue-at - --remote-name --remote-name-all --retry 3 --retry-delay 3 $tumblr_download_url
+		done
+		
 	tumblr_post_offset=`expr $tumblr_post_offset + 20`
-	sleep 3
-done
-
-echo "Found `cat $tumblr_blog_url.list | wc -l` images. Downloading..."
-
-for tumblr_download_url in `cat $tumblr_blog_url.list | sed 's/\"//g'`; do
-	curl --silent --referer "https://www.tumblr.com/dashboard" --user-agent "Mozilla/5.0" \
-		--continue-at - --remote-name --remote-name-all --retry 3 --retry-delay 3 $tumblr_download_url
+	sleep 5
 done
 
 echo "Done."
-
