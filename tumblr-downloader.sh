@@ -3,7 +3,7 @@
 # Home: https://github.com/Pernat1y/tumblr-downloader
 # Tumblr API reference: https://www.tumblr.com/docs/en/api/v2
 
-tumblr_app_key=fuiKNFp9vQFvjLNvx4sUwti4Yb5yGutBN4Xh10LXZhhRKjWlV4
+tumblr_app_key=
 
 tumblr_tags=
 
@@ -19,6 +19,12 @@ fi
 which curl jq >>/dev/null
 if [ $? -ne "0" ]; then
 	echo "I need curl ( https://curl.haxx.se ) and jq ( https://github.com/stedolan/jq ) to work"
+	exit
+fi
+
+if [ -z $tumblr_app_key ]; then
+	echo "You need own API key. You can get one here:"
+	echo "https://www.tumblr.com/oauth/apps"
 	exit
 fi
 
