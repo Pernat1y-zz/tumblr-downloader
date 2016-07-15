@@ -25,6 +25,7 @@ fi
 if [ -z $tumblr_app_key ]; then
 	echo "You need own API key. You can get one here:"
 	echo "https://www.tumblr.com/oauth/apps"
+	echo "then set tumblr_app_key variable at the top of this script"
 	exit
 fi
 
