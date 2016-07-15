@@ -5,6 +5,8 @@
 
 tumblr_app_key=fuiKNFp9vQFvjLNvx4sUwti4Yb5yGutBN4Xh10LXZhhRKjWlV4
 
+tumblr_tags=
+
 tumblr_blog_url=`echo $1 | sed 's/https://g; s/http://g; s/\///g'`
 tumblr_post_offset=0
 tumble_total_posts=
@@ -32,8 +34,8 @@ fi
 echo "There are $tumble_total_posts posts. Getting list of URLs to download..."
 sleep 10
 
-mkdir -p "$tumblr_blog_url" 2>/dev/null
-cd "$tumblr_blog_url"
+mkdir -p "$tumblr_blog_url/$tumblr_tags" 2>/dev/null
+cd "$tumblr_blog_url/$tumblr_tags"
 if [ $? -ne "0" ]; then
 	echo "Unable to create/enter directory. Check free space and permissions on current directory."
 	exit
@@ -42,7 +44,7 @@ fi
 while [ $tumblr_post_offset -lt $tumble_total_posts ]; do
 	echo "Downloading images. Page $tumblr_post_offset from $tumble_total_posts"
 	curl --silent --referer "https://www.tumblr.com/dashboard" --user-agent "Mozilla/5.0" --retry 3 --retry-delay 3 \
-	"https://api.tumblr.com/v2/blog/$tumblr_blog_url/posts/photo?api_key=$tumblr_app_key&offset=$tumblr_post_offset&limit=20" |\
+	"https://api.tumblr.com/v2/blog/$tumblr_blog_url/posts/photo?api_key=$tumblr_app_key&tag=$tumblr_tags&offset=$tumblr_post_offset&limit=20" |\
 	jq '.response | .posts | .[] | .photos | .[] | .original_size | .url' 2>/dev/null > $tumblr_blog_url.list
 	
 	if [ $? -eq "5" ]; then
@@ -56,7 +58,6 @@ while [ $tumblr_post_offset -lt $tumble_total_posts ]; do
 		done
 		
 	tumblr_post_offset=`expr $tumblr_post_offset + 20`
-	sleep 10
 done
 
 echo "Done."
