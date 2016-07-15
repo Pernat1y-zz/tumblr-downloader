@@ -5,14 +5,13 @@
 
 tumblr_app_key=
 
-tumblr_tags=
-
 tumblr_blog_url=`echo $1 | sed 's/https://g; s/http://g; s/\///g'`
+tumblr_tags=$2
 tumblr_post_offset=0
 tumble_total_posts=
 
 if [ -z $1 ]; then
-	echo "Usage: $0 blog.tumblr.com"
+	echo "Usage: $0 blog.tumblr.com [tag]"
 	exit
 fi
 
